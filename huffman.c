@@ -26,14 +26,15 @@ int main() {
 	init_stack(&s);
 	init_dictionary();
 //	printf("%lf",pow(2,5));
-	char str[100] = "55 66 11 4 11 33 44 99 67 12 34 56 00 34", enc[21];
+	char str[1000] = "54 66 11 4 11 33 44 99 67 12 34 56 00 34 23 12 67 90 34 12 45 56 89 34 12 23 87 12 34 76 89 89 65 12 34 56 78 9 99", enc[100];
 	
 	int bin, dec,i = 0, j, k,st, l = 0;
 	char ascii, ch; 
 	
 	// huffman encoding	
-	
-	while(i<40){
+	printf("Input string - ");
+	puts(str);
+	while(i<120){
 	
 		// bin = binary representation of char
 		//pushing binary representation into stack if stack is not full
@@ -64,8 +65,8 @@ int main() {
 			dec = dec + pop_stack(&s)*4;
 			dec = dec + pop_stack(&s)*2;
 			dec = dec + pop_stack(&s)*1;
-			printf("%d %c ",dec,dec);
-			fprintf(fp,"%c",dec);
+//			printf("%d %c ",dec,dec);
+//			fprintf(fp,"%c",dec);
 			enc[l] = dec;
 			l++;
 			if(str[i] == ' ') {
@@ -86,33 +87,49 @@ int main() {
 		i++;
 
 	}
+	printf("\nEncoded string - ");
 	puts(enc);
+	printf("\nDecoded string - ");
 	//huffman decoding
 	i = 0;
-	int bin1, bin2, bin3, bin4;
+	int bin1, bin2, bin3, bin4,sum;
 	while(enc[i] != '\0') {
 		
 		bin = enc[i];
 		if(bin < 0)
 			bin = bin + 256;
-//		printf("%d",bin);
+	//	printf("%d ",bin);
+/*		dec = 0,sum = 0,j = 1;
+		while(bin != 0){
+			dec = bin%2 *j;
+			j = j*10;
+			sum = sum + dec;
+			bin = bin/2;
+		}*/
+//		printf("%d\n",sum);
 		bin1 = bin%2 * 1;
-		bin = bin/10;
+		bin = bin/2;
 		bin2 = bin1 + bin%2 * 2;
-		bin = bin/10;
+		bin = bin/2;
 		bin3 = bin2 + bin%2 * 4;
-		bin = bin/10;
+		bin = bin/2;
 		bin4 = bin3 + bin%2 * 8;
-		printf("%d ",bin4);
-		bin = bin/10;
+		if(bin4 == 11)
+			printf(" ");
+		else
+			printf("%d",bin4-1);
+		bin = bin/2;
 		bin1 = bin%2 * 1;
-		bin = bin/10;
+		bin = bin/2;
 		bin2 = bin1 + bin%2 * 2;
-		bin = bin/10;
+		bin = bin/2;
 		bin3 = bin2 + bin%2 * 4;
-		bin = bin/10;
+		bin = bin/2;
 		bin4 = bin3 + bin%2 * 8;
-		printf("%d ",bin4);		
+		if(bin4 == 11)
+			printf(" ");
+		else
+			printf("%d",bin4-1);		
 	
 	
 		i++;
@@ -200,7 +217,7 @@ dictionary[3][1] = 1;
 dictionary[3][2] = 0;
 dictionary[3][3] = 0;
 
-//index 0
+//index 4
 dictionary[4][0] = 0;
 dictionary[4][1] = 1;
 dictionary[4][2] = 0;

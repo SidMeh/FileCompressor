@@ -16,3 +16,7 @@ void init(Trie *t);
 int insert_pattern(Trie *t,char *c);
 trieNode* get_node(char c);
 int check_string(Trie *t,char *c);
+
+
+
+

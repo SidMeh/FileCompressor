@@ -26,6 +26,7 @@ trieNode* get_node(char c){
 }
 
 int insert_pattern(Trie *t,char *c){
+//	printf("%d ",count1);
 	if(c[0] == '\0')
 		return (*t)->count;
 	int ln = strlen(c);
@@ -66,6 +67,12 @@ int check_string(Trie *t,char *c){
 	return -1;
 }
 }
+
+
+
+
+
+
 
 
 
