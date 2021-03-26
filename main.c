@@ -49,12 +49,12 @@ int main() {
 	//	return 0;
 	}	
 	// encoding
-	encode(fs,fi);
+//	encode(fs,fi);
 	fclose(fi);
-	fi = fopen("intermediate.txt","r");
+	fi = fopen("huffman1.txt","r");
 	decode(fi,fd);
 	
-	
+//	makestring(fi,1024);
 	return 0;
 }
 
@@ -79,7 +79,7 @@ void makestring(FILE *fp, int num){
 		num = num/10;
 	//	printf("%d %c ",num,s[i]);
 	}
-	printf("%s",s);
+	fprintf(fp,"%s ",s);
 }
 
 
@@ -168,9 +168,10 @@ void encode(FILE *fp, FILE *fi) {
 	insert_pattern(&T," ");
 	insert_pattern(&T,"\t");
 	insert_pattern(&T,"\n");
+	insert_pattern(&T,",");
 //	insert_pattern(&T,".");
-	char sample[2000];
-	fgets(sample,2000,fp);
+	char sample[5000];
+	fgets(sample,5000,fp);
 	char output[1000],P1[10] = "",temp[100],nil[1] = "\0",P[10] ,C,K[2];
 	int i = 0,k,m,f,j = 0;
 	P[0] = sample[0];
@@ -193,11 +194,12 @@ void encode(FILE *fp, FILE *fi) {
 			strncat(P,&C,1);
 			strncat(P1,&C,1);		
 			printf("%d ",k);
+		//	makestring(fi,k);
 			fprintf(fi,"%d ",k);			
 		}
 	}
 	arr[l++] = m;
-
+	fprintf(fi,"%d ",-1);
 }
 
 
@@ -276,12 +278,13 @@ void decode(FILE *fp, FILE *fd) {
      dictionary[78] = tmp;
       tmp.currChar = '\n';
       dictionary[79] = tmp;
-      
+     tmp.currChar = ',';
+     dictionary[80] = tmp; 
         
     int prevCode;
     int currCode;
     char ch = 'b';
-    int limitingCode = 79;
+    int limitingCode = 80;
 
 	int num;
 	fscanf(fp,"%d",&num);
@@ -291,9 +294,11 @@ void decode(FILE *fp, FILE *fd) {
     getOutput(fd,prevCode , &ch);
    
     int index = 1;
-    while(index < 30)
+    while(1)
     {	fscanf(fp,"%d",&num);
         currCode = num;
+        if(num < 0)
+        	return;
         char tmpCh;
         if(currCode > limitingCode)
         {	
@@ -355,15 +360,6 @@ void addElementToDictionary(int p, char c,int *l)
     return;
 
 }
-
-
-
-
-
-
-
-
-
 
 
 
