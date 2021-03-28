@@ -121,7 +121,7 @@ void generate_code() {
 	for(i = 0;i<11;i++){
 		for(j=10;j>=0;j--){
 			arr3[k][0] = arr1[i]+arr2[j];
-			arr3[k][1] = k + 1;
+			arr3[k][1] = k + 6;
 //			printf("\n %d %d ",arr3[k][0],arr3[k][1]);
 			k++;
 		}

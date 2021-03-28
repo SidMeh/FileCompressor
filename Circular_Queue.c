@@ -10,8 +10,8 @@ void init(queue *q, int d) {
 }
 
 int isFullq(queue q) {
-	if((q.front == -1 && q.rear == q.size-1)|| q.rear + 1 == q.front) {
-		printf("The queue is FULL.");
+	if((q.front == 0 && q.rear == q.size-1)|| q.rear + 1 == q.front) {
+//		printf("The queue is FULL.");
 		return 1;
 }
 	return 0;
@@ -19,7 +19,7 @@ int isFullq(queue q) {
 
 int isEmptyq(queue q) {
 	if(q.front == -1 ) {
-		printf("The queue is empty.");	
+//		printf("The queue is empty.");	
 		return 1;
 	}
 	return 0;
