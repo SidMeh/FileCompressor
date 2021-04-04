@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "trie.h"
 #include "sequence.h"
+#include <string.h>
 void encode(FILE *fp,FILE *fi);
 void decode(FILE *fp, FILE *fd);
 
@@ -19,41 +20,46 @@ typedef struct dictElement{
 
 
 
-void getOutput(FILE *fp,int code, char *t);
+void Output(FILE *fp,int code, char *t);
 
-void addElementToDictionary(int p, char c,int *l);
+void addToDictionary(int p, char c,int *l);
 dictElement dictionary[4096];
 
-int main() {
+int main(int argc,char **argv) {
 
 	FILE *fd, *fs, *fi;
 	
-	fs = fopen("source.txt","r+");
+	if(strcmp(argv[1],"compress")==0){
+	fs = fopen(argv[2],"r+");
 	
 	if(fs == NULL){
 		printf("Problem in opening File !!!\n");
 //		return 0;
 	}
 	
-	fd = fopen("destination.txt","w");
+
 	
-	if(fd == NULL){
-		printf("Problem in compressing File1 !!!\n");
-	//	return 0;
-	}	
-	
-	fi = fopen("intermediate.txt","w");
+	fi = fopen(argv[4],"w");
 	
 	if(fi == NULL){
 		printf("Problem in compressing File2 !!!\n");
 	//	return 0;
 	}	
 	// encoding
-//	encode(fs,fi);
+	encode(fs,fi);
 	fclose(fi);
-	fi = fopen("huffman1.txt","r");
-	decode(fi,fd);
+	}
+	else if(strcmp(argv[1],"decompress")==0){
 	
+	fi = fopen(argv[2],"r");
+	fd = fopen(argv[4],"w");
+	
+	if(fd == NULL){
+		printf("Problem in compressing File1 !!!\n");
+	//	return 0;
+	}	
+	decode(fi,fd);
+	}
 //	makestring(fi,1024);
 	return 0;
 }
@@ -170,8 +176,8 @@ void encode(FILE *fp, FILE *fi) {
 	insert_pattern(&T,"\n");
 	insert_pattern(&T,",");
 //	insert_pattern(&T,".");
-	char sample[5000];
-	fgets(sample,5000,fp);
+	char sample[9000];
+	fread(sample,1,9000,fp);
 	char output[1000],P1[10] = "",temp[100],nil[1] = "\0",P[10] ,C,K[2];
 	int i = 0,k,m,f,j = 0;
 	P[0] = sample[0];
@@ -218,119 +224,119 @@ void decode(FILE *fp, FILE *fd) {
         tmp.currChar = i+97;
         dictionary[i+26] = tmp;
     }
-    dictElement tmp;
-        tmp.prefixCode = -1;
-	 tmp.currChar = '[';
-      dictionary[52] = tmp;
-	 tmp.currChar = '\\';
-      dictionary[53] = tmp;
-	 tmp.currChar = ']';
-      dictionary[54] = tmp;      
-	 tmp.currChar = '^';
-      dictionary[55] = tmp;      
-	 tmp.currChar = '_';
-      dictionary[56] = tmp;
-	 tmp.currChar = '`';
-      dictionary[57] = tmp;      
-	 tmp.currChar = '1';
-      dictionary[58] = tmp;
-	 tmp.currChar = '2';
-      dictionary[59] = tmp;
-	 tmp.currChar = '3';
-      dictionary[60] = tmp;    
-	 tmp.currChar = '4';
-      dictionary[61] = tmp;      
-      tmp.currChar = '5';
-      dictionary[62] = tmp;
-      tmp.currChar = '6';
-      dictionary[63] = tmp;
-      tmp.currChar = '7';
-      dictionary[64] = tmp;
-      tmp.currChar = '8';
-      dictionary[65] = tmp;
-      tmp.currChar = '9';
-      dictionary[66] = tmp;
-      tmp.currChar = '0';
-      dictionary[67] = tmp;
-      tmp.currChar = '!';
-      dictionary[68] = tmp;
-      tmp.currChar = '@';
-      dictionary[69] = tmp;
-      tmp.currChar = '#';
-      dictionary[70] = tmp;
-      tmp.currChar = '.';
-      dictionary[71] = tmp;
-      tmp.currChar = '%';
-      dictionary[72] = tmp;
-      tmp.currChar = '&';
-      dictionary[73] = tmp;
-      tmp.currChar = '*';
-      dictionary[74] = tmp;
-      tmp.currChar = '(';
-      dictionary[75] = tmp;
-      tmp.currChar = ')';
-      dictionary[76] = tmp;
-      tmp.currChar = ' ';
-      dictionary[77] = tmp;
+    dictElement srm;
+        srm.prefixCode = -1;
+	 srm.currChar = '[';
+      dictionary[52] = srm;
+	 srm.currChar = '\\';
+      dictionary[53] = srm;
+	 srm.currChar = ']';
+      dictionary[54] = srm;      
+	 srm.currChar = '^';
+      dictionary[55] = srm;      
+	 srm.currChar = '_';
+      dictionary[56] = srm;
+	 srm.currChar = '`';
+      dictionary[57] = srm;      
+	 srm.currChar = '1';
+      dictionary[58] = srm;
+	 srm.currChar = '2';
+      dictionary[59] = srm;
+	 srm.currChar = '3';
+      dictionary[60] = srm;    
+	 srm.currChar = '4';
+      dictionary[61] = srm;      
+      srm.currChar = '5';
+      dictionary[62] = srm;
+      srm.currChar = '6';
+      dictionary[63] = srm;
+      srm.currChar = '7';
+      dictionary[64] = srm;
+      srm.currChar = '8';
+      dictionary[65] = srm;
+      srm.currChar = '9';
+      dictionary[66] = srm;
+      srm.currChar = '0';
+      dictionary[67] = srm;
+      srm.currChar = '!';
+      dictionary[68] = srm;
+      srm.currChar = '@';
+      dictionary[69] = srm;
+      srm.currChar = '#';
+      dictionary[70] = srm;
+      srm.currChar = '.';
+      dictionary[71] = srm;
+      srm.currChar = '%';
+      dictionary[72] = srm;
+      srm.currChar = '&';
+      dictionary[73] = srm;
+      srm.currChar = '*';
+      dictionary[74] = srm;
+      srm.currChar = '(';
+      dictionary[75] = srm;
+      srm.currChar = ')';
+      dictionary[76] = srm;
+      srm.currChar = ' ';
+      dictionary[77] = srm;
    //   tmp.currChar = '.';
   //    dictionary[78] = tmp;
-     tmp.currChar = '\t';
-     dictionary[78] = tmp;
-      tmp.currChar = '\n';
-      dictionary[79] = tmp;
-     tmp.currChar = ',';
-     dictionary[80] = tmp; 
+     srm.currChar = '\t';
+     dictionary[78] = srm;
+      srm.currChar = '\n';
+      dictionary[79] = srm;
+     srm.currChar = ',';
+     dictionary[80] = srm; 
         
-    int prevCode;
-    int currCode;
-    char ch = 'b';
-    int limitingCode = 80;
+    int prev;
+    int curr;
+    char ch = 'c';
+    int max = 80;
 
 	int num;
 	fscanf(fp,"%d",&num);
 //	fscanf(fd,"%d",&num);
-    prevCode = num;
+    prev = num;
 //	printf("dec%d",num);
-    getOutput(fd,prevCode , &ch);
+    Output(fd,prev , &ch);
    
-    int index = 1;
+    int i = 1;
     while(1)
     {	fscanf(fp,"%d",&num);
-        currCode = num;
+        curr = num;
         if(num < 0)
         	return;
-        char tmpCh;
-        if(currCode > limitingCode)
+        char tmp;
+        if(curr > max)
         {	
-            getOutput(fd,prevCode , &tmpCh);
+            Output(fd,prev , &tmp);
             printf("%c",ch);
 		  fprintf(fd,"%c",ch);
         }
         else
         {		
-            getOutput(fd,currCode,&tmpCh);
+            Output(fd,curr,&tmp);
 
         }
 
-        ch = tmpCh;
+        ch = tmp;
 
-        addElementToDictionary(prevCode,ch,&limitingCode);
-        index++;
+        addToDictionary(prev,ch,&max);
+        i++;
 
-        prevCode =  currCode;
-
-}
-
+        prev =  curr;
 
 }
 
 
+}
 
-void getOutput(FILE *fp,int code, char *t)
+
+
+void Output(FILE *fp,int key, char *t)
 {//	printf("%d %c",code,dictionary[code].currChar);
-    if(dictionary[code].prefixCode == -1)
+    if(dictionary[key].prefixCode == -1)
     { //   printf("UYT");
-        *t  = dictionary[code].currChar;
+        *t  = dictionary[key].currChar;
         char tmpt = *t;
         printf("%c",tmpt);
       fprintf(fp,"%c",tmpt);
@@ -339,9 +345,9 @@ void getOutput(FILE *fp,int code, char *t)
     }
    else
     {// printf("UYT");
-        int pre = dictionary[code].prefixCode;
-        getOutput(fp,pre, t);
-        char curr = dictionary[code].currChar;
+        int pre = dictionary[key].prefixCode;
+        Output(fp,pre, t);
+        char curr = dictionary[key].currChar;
         printf("%c",curr);
         fprintf(fp,"%c",curr);
 
@@ -352,7 +358,7 @@ void getOutput(FILE *fp,int code, char *t)
 
 }
 
-void addElementToDictionary(int p, char c,int *l)
+void addToDictionary(int p, char c,int *l)
 {
     *l = *l+1;
     dictionary[(*l)].currChar = c;
