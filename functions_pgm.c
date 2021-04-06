@@ -3,10 +3,13 @@
 #include "max_heap.h"
 #include "stack.h"
 #include "functions_pgm.h"
-#include "math.h"
+#include <math.h>
 
 #define OFFSET 1
 #define RGB_VALUE 0
+#define R 0
+#define G 1
+#define B 2
 
 void init_pgm_image_from_file(FILE *fp, pgm_Image *Image){
 	if(fp == NULL)
@@ -21,6 +24,8 @@ void init_pgm_image_from_file(FILE *fp, pgm_Image *Image){
 	printf("Image width: %d\n",Image->width);
 	printf("Image height: %d\n",Image->height);
 	printf("Image maximum gray scale: %d\n",Image->max_gray_scale);
+//	Image->height = 3*Image->height;
+//	Image->width = 3*Image->width;
 	Image->pixel_array = (int**)malloc(sizeof(int*)*Image->height);
 	int i = 0,j;
 	for(i=0;i<Image->height;i++)
@@ -348,7 +353,7 @@ void makestring(FILE *fp, int num){
 void reduce_image_size(int percentage){
 	float ratio = (1.0*percentage)/100;
 	pgm_Image Image, Image_out;
-	FILE *fp = fopen("pgmimg.pgm","rb");
+	FILE *fp = fopen("pgmimg.ppm","rb");
 	fscanf(fp,"%s",Image.type);
 	fscanf(fp,"%d %d",&Image.width,&Image.height);
 	fscanf(fp,"%d",&Image.max_gray_scale);
@@ -357,7 +362,7 @@ void reduce_image_size(int percentage){
 	float k, c;
 	x = Image.width;
 	y = Image.height;
-	k = sqrt(ratio*y/x);
+//	k = sqrt(ratio*y/x);
 	c = ratio/k;
 	x1 = k*x;
 	y1 = c*y;
@@ -373,18 +378,149 @@ void reduce_image_size(int percentage){
 			pixel_arr[i][j] = (int*)malloc(sizeof(int)*2);
 		}
 	}
-
-
-
-
-
-
-
-
-
+	
+	
 }
 
 
+
+void init_ppm_image_from_file(FILE *fp,ppm_Image* Image){
+	fscanf(fp,"%s",Image->header);
+	fscanf(fp,"%d %d",&Image->width,&Image->height);
+	fscanf(fp,"%d",&Image->max_color_scale);
+	printf("Image header :%s\n",Image->header);
+	printf("Image height :%d\n",Image->height);
+	printf("Image width :%d\n",Image->width);
+	printf("Image max color scale :%d\n",Image->max_color_scale);
+	
+	// reading pixel array;
+	int i = 0, j= 0;
+	Image->pixel_array = (int***)malloc(sizeof(int**)*Image->height);
+	for(i=0;i<Image->height;i++)
+		Image->pixel_array[i] = (int**)malloc(sizeof(int*)*Image->width);
+	
+	for(i=0;i< Image->height;i++){
+		for(j=0;j< Image->width;j++){
+			Image->pixel_array[i][j] = (int*)malloc(sizeof(int*)*3);
+		}
+	}
+	
+	FILE *fr;
+	fr = fopen("image_read.txt","w");
+	
+	for(i=0; i < Image->height; i++){
+		for(j = 0;j < Image->width;j++){
+			fscanf(fp,"%d %d %d ",&Image->pixel_array[i][j][R],&Image->pixel_array[i][j][G],&Image->pixel_array[i][j][B]);
+			fprintf(fr,"%d %d %d ",Image->pixel_array[i][j][R],Image->pixel_array[i][j][G],Image->pixel_array[i][j][B]);
+		}
+//		printf("\n");
+	}
+}
+
+
+void convert_image_from_ppm_to_txt(ppm_Image Image){
+	max_heap h;
+	init_max_heap(&h);
+	int code_arr[256][2];
+	int i, j, temp;
+	for(i=0;i<256;i++){
+		code_arr[i][0] = 0;
+		code_arr[i][1] = 1;
+	} 
+	
+	for(i=0;i<Image.height;i++){
+		for(j=0;j<Image.width;j++){
+			temp = Image.pixel_array[i][j][R];
+			code_arr[temp][0]++;
+			temp = Image.pixel_array[i][j][G];
+			code_arr[temp][0]++;
+			temp = Image.pixel_array[i][j][B];
+			code_arr[temp][0]++;			
+		}
+	}
+	for(i=0;i<256;i++)
+		insert_max_heap(&h,code_arr[i][0],i);
+	map_code_via_heap(h,code_arr);
+	for(i=0;i<256;i++){
+		printf("\n%d %d",i,code_arr[i][1]);		
+		if(code_arr[i][1] > 255)
+			printf("ERROR");
+	}
+	FILE *fr = fopen("image_read.txt","w");	
+	
+	for(i=0;i<Image.height;i++){
+		for(j=0;j<Image.width;j++){
+			temp = Image.pixel_array[i][j][R];
+			makestring(fr,code_arr[temp][1]);
+			temp = Image.pixel_array[i][j][G];
+			makestring(fr,code_arr[temp][1]);
+			temp = Image.pixel_array[i][j][B];
+			makestring(fr,code_arr[temp][1]);
+			
+		}
+	}	
+	fprintf(fr,"%c",'e');
+	fclose(fr);
+	
+	FILE *ft = fopen("image_info.txt","w");
+	fprintf(ft,"%s\n",Image.header);
+	fprintf(ft,"%d %d\n",Image.height,Image.width);
+	fprintf(ft,"%d\n",Image.max_color_scale);
+	for(i = 0; i < 256 ; i++){
+		fprintf(ft,"%d %d\n",i,code_arr[i][1]);
+	} 
+	fclose(ft);
+	fr = fopen("image_read.txt","r");
+	bit_encode_image(fr);
+}
+
+
+void convert_txt_data_to_ppm(){
+	
+	FILE *fp = fopen("img.ppm","wb");
+	ppm_Image Image;
+	bit_decode_image();
+	FILE *fr = fopen("image_info.txt","r");
+	fscanf(fr,"%s",Image.header);
+	fscanf(fr,"%d %d", &Image.width, &Image.height);
+	fscanf(fr,"%d", &Image.max_color_scale);
+	
+	fprintf(fp,"%s\n",Image.header);
+	fprintf(fp,"%d %d\n", Image.width, Image.height);
+	fprintf(fp,"%d\n",Image.max_color_scale);
+	printf("%s\n",Image.header);
+	printf("%d %d\n", Image.width, Image.height);
+	printf("%d\n",Image.max_color_scale);
+	int i, j, num1, num2, num3, code_arr[256];
+	for(i =0; i < 256; i++){
+		fscanf(fr,"%d %d", &num1, &num2);
+		code_arr[num2] = num1;
+	}
+	
+	Image.pixel_array = (int***)malloc(sizeof(int**)*Image.height);
+	for(i=0;i<Image.height;i++)
+		Image.pixel_array[i] = (int**)malloc(sizeof(int*)*Image.width);
+	
+	for(i=0;i< Image.height;i++){
+		for(j=0;j< Image.width;j++){
+			Image.pixel_array[i][j] = (int*)malloc(sizeof(int*)*3);
+		}
+	}
+	
+	FILE *ft = fopen("image_out.txt","r");
+	for(i=0;i<Image.height;i++){
+		for(j=0;j< Image.width;j++){
+			fscanf(ft,"%d %d %d", &num1, &num2, &num3);
+			printf("%d %d %d ",num1,num2,num3);
+			Image.pixel_array[i][j][R] = code_arr[num1];
+			Image.pixel_array[i][j][G] = code_arr[num2];
+			Image.pixel_array[i][j][B] = code_arr[num3];
+			fprintf(fp,"%d %d %d ", Image.pixel_array[i][j][R], Image.pixel_array[i][j][G], Image.pixel_array[i][j][B]);
+		}
+	}
+	
+	fclose(fp);
+}
 
 
 

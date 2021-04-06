@@ -7,6 +7,13 @@ typedef struct pgm_Image{
 	int **pixel_array;
 }pgm_Image;
 
+typedef struct ppm_Image{
+	char header[4];
+	int height, width;
+	int max_color_scale;
+	int ***pixel_array;
+}ppm_Image;
+
 int dictionary[11][4];
 void init_dictionary();
 int numlen(int num);
@@ -18,3 +25,8 @@ void bit_encode_image(FILE *fp);
 void bit_decode_image();
 void convert_txt_into_pgm();
 void reduce_image_size(int percentage);
+
+
+void init_ppm_image_from_file(FILE *fp,ppm_Image* Image);
+void convert_image_from_ppm_to_txt(ppm_Image Image);
+void convert_txt_data_to_ppm();
