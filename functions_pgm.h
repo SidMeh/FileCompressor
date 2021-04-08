@@ -24,9 +24,10 @@ void convert_image_from_pgm_to_txt(pgm_Image img);
 void bit_encode_image(FILE *fp);
 void bit_decode_image();
 void convert_txt_into_pgm();
-void reduce_image_size(int percentage);
+void reduce_image_size();
 
 
 void init_ppm_image_from_file(FILE *fp,ppm_Image* Image);
 void convert_image_from_ppm_to_txt(ppm_Image Image);
 void convert_txt_data_to_ppm();
+void reduce_image_size_ppm();

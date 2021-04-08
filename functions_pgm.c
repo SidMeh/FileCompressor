@@ -3,10 +3,13 @@
 #include "max_heap.h"
 #include "stack.h"
 #include "functions_pgm.h"
+#include "linked_list.h"
+#include <string.h>
 #include <math.h>
 
 #define OFFSET 1
-#define RGB_VALUE 0
+#define OFSET 3
+#define BW_VALUE 0
 #define R 0
 #define G 1
 #define B 2
@@ -350,19 +353,24 @@ void makestring(FILE *fp, int num){
 }
 
 
-void reduce_image_size(int percentage){
+void reduce_image_size(){
+	printf("Enter the percentage to reduction of the .pgm image : ");
+	int percentage;
+	scanf("%d",&percentage);
+	percentage = percentage;
 	float ratio = (1.0*percentage)/100;
 	pgm_Image Image, Image_out;
-	FILE *fp = fopen("pgmimg.ppm","rb");
-	fscanf(fp,"%s",Image.type);
-	fscanf(fp,"%d %d",&Image.width,&Image.height);
-	fscanf(fp,"%d",&Image.max_gray_scale);
+	FILE *fp = fopen("pgmimg.pgm","rb");
+	fscanf(fp, "%s", Image.type);
+	fscanf(fp, "%d %d", &Image.width, &Image.height);
+	fscanf(fp, "%d", &Image.max_gray_scale);
 	
-	int x, x1, y, y1, i, j;
+	int x, x1, y, y1, i, j, i1 = -1, j1 = 0;
 	float k, c;
 	x = Image.width;
 	y = Image.height;
-//	k = sqrt(ratio*y/x);
+	float k1 = ratio*x/y;
+	k = sqrt(k1);
 	c = ratio/k;
 	x1 = k*x;
 	y1 = c*y;
@@ -370,15 +378,99 @@ void reduce_image_size(int percentage){
 	Image_out.height = y1;
 	
 	int ***pixel_arr;
-	pixel_arr = (int***)malloc(sizeof(int**)*Image_out.height);
-	for(i=0;i<Image_out.height;i++)
+	pixel_arr = (int***)malloc(sizeof(int**)*Image.height);
+	for(i=0;i<Image.height;i++)
 		pixel_arr[i] = (int**)malloc(sizeof(int*)*Image.width);
-	for(i=0;i<Image_out.height;i++){
-		for(j=0;j<Image_out.width;j++){
+	for(i=0;i<Image.height;i++){
+		for(j=0;j<Image.width;j++){
 			pixel_arr[i][j] = (int*)malloc(sizeof(int)*2);
 		}
 	}
 	
+	Image.pixel_array = (int**)malloc(sizeof(int*)*Image.height);
+	for(i=0;i<Image.height;i++)
+		Image.pixel_array[i] = (int*)malloc(sizeof(int)*Image.width);
+	
+	int X_REMOVAL = x - x1, Y_REMOVAL = y - y1, l = 0;
+	int X_INTERVAL, Y_INTERVAL;
+	X_INTERVAL = x/X_REMOVAL;
+	Y_INTERVAL = y/Y_REMOVAL;
+	printf("\nInput image header/type : %s", Image.type);
+	printf("\nInput image height : %d", Image.height);
+	printf("\nInput image width : %d", Image.width);
+	printf("\nInput image maximum gray scale : %d",Image.max_gray_scale);
+	
+	strcpy(Image_out.type,Image.type);
+	Image_out.height = y1;
+	Image_out.width = x1;
+	Image_out.max_gray_scale =  Image.max_gray_scale;
+	printf("\nOutput image header/type : %s", Image_out.type);
+	printf("\nOutput image height : %d", Image_out.height);
+	printf("\nOutput image width : %d", Image_out.width);
+	printf("\nOutput image maximum gray scale : %d",Image_out.max_gray_scale);
+	
+	printf("\nX_INTERVAL : %d",X_INTERVAL);
+	printf("\nY_INTERVAL : %d",Y_INTERVAL);
+	//Loading input image into structure/RAM
+	for(i = 0; i < Image.height; i++){
+		for(j = 0; j < Image.width; j++){
+			fscanf(fp,"%d ",&Image.pixel_array[i][j]);
+			pixel_arr[i][j][BW_VALUE] = Image.pixel_array[i][j];
+			if( j%X_INTERVAL == 0){
+				pixel_arr[i][j][OFFSET] = 0;
+				l++;
+			}
+			else
+				pixel_arr[i][j][OFFSET] = 1;
+		}
+	}
+	printf(" %d ",l);
+	//adjusting pixel values i
+	int prev_i, prev_j, next_i, next_j;
+	for(i=0;i< Image.height; i++){
+		for(j = 0; j < Image.width; j++){
+			if(pixel_arr[i][j][OFFSET] == 0){
+				prev_i = i-1;
+				next_i = i+1;
+				prev_j = j-1;
+				next_j = j+1;
+				if(prev_i >= 0 && prev_j >= 0)
+					pixel_arr[prev_i][prev_j][BW_VALUE] = (pixel_arr[prev_i][prev_j][BW_VALUE] + pixel_arr[prev_i][prev_j][BW_VALUE])/2;
+				if(next_i <= Image.height-1 && next_j <= Image.width-1)
+					pixel_arr[next_i][next_j][BW_VALUE] = (pixel_arr[next_i][next_j][BW_VALUE] + pixel_arr[next_i][next_j][BW_VALUE])/2;
+			}	
+		}
+	}
+	//assigning
+	Image_out.pixel_array = (int**)malloc(sizeof(int*)*Image.height);
+	for(i=0;i<Image.height;i++)
+		Image_out.pixel_array[i] = (int*)malloc(sizeof(int)*Image.width);
+		
+	for(i=0;i<Image.height;i++){
+		j1 = 0;
+		for(j = 0; j< Image.width;j++){
+			if(j == 0){
+				i1++;
+				j1 = 0;
+			}
+			if(pixel_arr[i][j][OFFSET] == 1)
+				Image_out.pixel_array[i1][j1++] = pixel_arr[i][j][BW_VALUE];
+		}
+	}			
+	
+	//printing image;
+	fclose(fp);
+	fp = fopen("imgg.pgm","wb");
+	fprintf(fp, "%s\n",Image.type);
+	fprintf(fp, "%d %d\n", x1, y1);
+	fprintf(fp,"%d\n",Image_out.max_gray_scale);
+	for(i = 0; i < Image_out.height; i++){
+		for(j = 0; j < Image_out.width; j++){
+//			if(pixel_arr[i][j][OFFSET] == 1)
+				fprintf(fp, "%d ", Image_out.pixel_array[i][j]);
+		}
+	}
+	fclose(fp);
 	
 }
 
@@ -523,7 +615,83 @@ void convert_txt_data_to_ppm(){
 }
 
 
-
+void reduce_image_size_ppm(){
+	printf("Enter the percentage to reduction of the .ppm image : ");
+	int percentage, i, j;
+	scanf("%d",&percentage);
+	float ratio = (1.0*percentage)/100;
+	FILE *fp = fopen("img.ppm","rb");
+	ppm_Image Image;
+	fscanf(fp, "%s", Image.header);
+	fscanf(fp, "%d %d", &Image.width, &Image.height);
+	fscanf(fp, "%d", &Image.max_color_scale);
+	printf("%s %d %d %d ", Image.header, Image.width, Image.height, Image.max_color_scale);
+	Image.pixel_array = (int***)malloc(sizeof(int**)*Image.height);
+	for(i=0;i<Image.height;i++)
+		Image.pixel_array[i] = (int**)malloc(sizeof(int*)*Image.width);
+	
+	for(i=0;i< Image.height;i++){
+		for(j=0;j< Image.width;j++){
+			Image.pixel_array[i][j] = (int*)malloc(sizeof(int*)*3);
+		}
+	}
+	for(i = 0;i < Image.height; i++){
+		for(j = 0;j < Image.width; j++){
+			fscanf(fp,"%d %d %d ", &Image.pixel_array[i][j][R], &Image.pixel_array[i][j][G], &Image.pixel_array[i][j][B]);
+		}
+	}
+	int x, x1, y, y1 ;
+	float k, c;
+	x = Image.width;
+	y = Image.height;
+	float k1 = ratio*x/y;
+	k = sqrt(k1);
+	c = ratio/k;
+	x1 = k*x;
+	y1 = c*y;
+	int X_REMOVAL = x - x1, Y_REMOVAL = y - y1, l = -1, set;
+	int X_INTERVAL, Y_INTERVAL;
+	X_INTERVAL = x/X_REMOVAL;
+	Y_INTERVAL = y/Y_REMOVAL;
+	
+	pixel_list *pixl;
+	pixl = (pixel_list*)malloc(sizeof(pixel_list)*x1);
+	for(i=0;i< x1;i++)
+		init_pixel_list(&pixl[i]);
+	
+	for(i=0;i< x;i++){
+		if(i%X_INTERVAL != 0)
+			l++;
+		for(j=0;j< y;j++){
+			set = 1;
+			if(j%Y_INTERVAL == 0)
+				set = 0;
+			if(i%X_INTERVAL != 0)
+				insert_pixel_list(&pixl[l], Image.pixel_array[i][j][R], Image.pixel_array[i][j][G], Image.pixel_array[i][j][B], set);
+		}
+	}
+			 
+	for(i=0;i<x1;i++){
+		pixel_list_modify(pixl[i]);
+		pixel_list_remove_unwanted(&pixl[i]);
+//		int k = pixel_list_length(pixl[i]);
+//		printf(" %d",k);
+	}
+	
+	FILE *fop = fopen("imgg.ppm","wb");
+	if(fop == NULL)
+		return;
+		
+	fprintf(fop, "%s\n", Image.header);
+	fprintf(fop, "%d %d\n", x1, y1);
+	fprintf(fop, "%d\n", Image.max_color_scale);
+	
+	for(i=0;i<x1;i++)
+		print_pixel_list_in_file(pixl[i],fop,y1);
+		
+	fclose(fop);
+	
+}
 
 
 
