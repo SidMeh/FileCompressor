@@ -45,7 +45,7 @@ void init_pgm_image_from_file(FILE *fp, pgm_Image *Image){
 
 }
 
-void convert_image_from_pgm_to_txt(pgm_Image Image){
+void convert_image_from_pgm_to_txt(pgm_Image Image, char *str){
 	max_heap h;
 	init_max_heap(&h);
 	int code_arr[256][2];
@@ -91,24 +91,27 @@ void convert_image_from_pgm_to_txt(pgm_Image Image){
 	fclose(fc);
 	
 	fp = fopen("image_read.txt","r");
-	bit_encode_image(fp);
-	bit_decode_image();
+	bit_encode_image(fp,str);
+//	bit_decode_image();
 }
 
 
-void bit_encode_image(FILE *fp) {
+void bit_encode_image(FILE *fp,char *str) {
 	init_dictionary();
 	stack s;
 	init_stack(&s,8);
 	int dec, k;
-	FILE *fr = fopen("image_shrink.txt","w");
+	FILE *fr = fopen(str,"w");
 	char ch;
 	while(1){
 		fscanf(fp,"%c",&ch);
 		printf("%c",ch);
 		if(ch == 'e')
 			break;
+			if(ch == '-')
+				continue;
 		if(isFull(s) == 0) {
+
 			if(ch == ' ') {
 				stack_push(&s,dictionary[10][3]);
 				stack_push(&s,dictionary[10][2]);
@@ -161,9 +164,9 @@ void bit_encode_image(FILE *fp) {
 }
 
 
-void bit_decode_image(){
-	
-	FILE *fr = fopen("image_shrink.txt","r");
+void bit_decode_image(FILE *fr){
+//	FILE *fr = fopen(str,"r");
+	printf("YES");
 	FILE *fw = fopen("image_out.txt","w");
 	
 	int bin, bin1, bin2, bin3, bin4;
@@ -214,7 +217,8 @@ void bit_decode_image(){
 
 }
 
-void convert_txt_into_pgm(){
+void convert_txt_into_pgm(FILE *fimg, FILE *ftxt){
+	bit_decode_image(ftxt);
 	pgm_Image Image;
 	FILE *fr = fopen("image_info.txt","r");
 	fscanf(fr,"%s",Image.type);
@@ -236,9 +240,9 @@ void convert_txt_into_pgm(){
 		*(Image.pixel_array + i) = (int*)malloc(sizeof(int)*Image.width);
 
 	//writing txt back into image file
-	FILE *ftxt, *fimg;
-	ftxt = fopen("image_out.txt","r");
-	fimg = fopen("img.pgm","wb");
+	FILE *ftxt1;
+	ftxt1 = fopen("image_out.txt","r");
+//	fimg = fopen("img.pgm","wb");
 	
 	fprintf(fimg,"%s\n",Image.type);
 	fprintf(fimg, "%d %d\n", Image.width, Image.height);
@@ -246,7 +250,7 @@ void convert_txt_into_pgm(){
 	
 	for(i=0;i<Image.height;i++){
 		for(j=0;j<Image.width;j++){
-			fscanf(ftxt,"%d",&temp);
+			fscanf(ftxt1,"%d",&temp);
 			Image.pixel_array[i][j] = code_arr[temp];
 			fprintf(fimg,"%d ",Image.pixel_array[i][j]);
 		}
@@ -254,7 +258,7 @@ void convert_txt_into_pgm(){
 	}
 			
 	fclose(fimg);
-	fclose(ftxt);		
+	fclose(ftxt1);		
 
 }
 
@@ -353,14 +357,14 @@ void makestring(FILE *fp, int num){
 }
 
 
-void reduce_image_size(){
+void reduce_image_size(FILE *fp, FILE *fop){
 	printf("Enter the percentage to reduction of the .pgm image : ");
 	int percentage;
 	scanf("%d",&percentage);
 	percentage = percentage;
 	float ratio = (1.0*percentage)/100;
 	pgm_Image Image, Image_out;
-	FILE *fp = fopen("pgmimg.pgm","rb");
+//	FILE *fp = fopen("pgmimg.pgm","rb");
 	fscanf(fp, "%s", Image.type);
 	fscanf(fp, "%d %d", &Image.width, &Image.height);
 	fscanf(fp, "%d", &Image.max_gray_scale);
@@ -460,17 +464,17 @@ void reduce_image_size(){
 	
 	//printing image;
 	fclose(fp);
-	fp = fopen("imgg.pgm","wb");
-	fprintf(fp, "%s\n",Image.type);
-	fprintf(fp, "%d %d\n", x1, y1);
-	fprintf(fp,"%d\n",Image_out.max_gray_scale);
+//	fp = fopen("imgg.pgm","wb");
+	fprintf(fop, "%s\n",Image.type);
+	fprintf(fop, "%d %d\n", x1, y1);
+	fprintf(fop,"%d\n",Image_out.max_gray_scale);
 	for(i = 0; i < Image_out.height; i++){
 		for(j = 0; j < Image_out.width; j++){
 //			if(pixel_arr[i][j][OFFSET] == 1)
-				fprintf(fp, "%d ", Image_out.pixel_array[i][j]);
+				fprintf(fop, "%d ", Image_out.pixel_array[i][j]);
 		}
 	}
-	fclose(fp);
+	fclose(fop);
 	
 }
 
@@ -510,7 +514,7 @@ void init_ppm_image_from_file(FILE *fp,ppm_Image* Image){
 }
 
 
-void convert_image_from_ppm_to_txt(ppm_Image Image){
+void convert_image_from_ppm_to_txt(ppm_Image Image,char *str1){
 	max_heap h;
 	init_max_heap(&h);
 	int code_arr[256][2];
@@ -563,15 +567,16 @@ void convert_image_from_ppm_to_txt(ppm_Image Image){
 	} 
 	fclose(ft);
 	fr = fopen("image_read.txt","r");
-	bit_encode_image(fr);
+	char *str;
+	bit_encode_image(fr,str1);
 }
 
 
-void convert_txt_data_to_ppm(){
+void convert_txt_data_to_ppm(FILE *fp, FILE *ftxt){
 	
-	FILE *fp = fopen("img.ppm","wb");
+//	FILE *fp = fopen("img.ppm","wb");
 	ppm_Image Image;
-	bit_decode_image();
+	bit_decode_image(ftxt);
 	FILE *fr = fopen("image_info.txt","r");
 	fscanf(fr,"%s",Image.header);
 	fscanf(fr,"%d %d", &Image.width, &Image.height);
@@ -615,12 +620,12 @@ void convert_txt_data_to_ppm(){
 }
 
 
-void reduce_image_size_ppm(){
+void reduce_image_size_ppm(FILE *fp, FILE *fop){
 	printf("Enter the percentage to reduction of the .ppm image : ");
 	int percentage, i, j;
 	scanf("%d",&percentage);
 	float ratio = (1.0*percentage)/100;
-	FILE *fp = fopen("img.ppm","rb");
+//	FILE *fp = fopen("img.ppm","rb");
 	ppm_Image Image;
 	fscanf(fp, "%s", Image.header);
 	fscanf(fp, "%d %d", &Image.width, &Image.height);
@@ -678,7 +683,7 @@ void reduce_image_size_ppm(){
 //		printf(" %d",k);
 	}
 	
-	FILE *fop = fopen("imgg.ppm","wb");
+//	FILE *fop = fopen("imgg.ppm","wb");
 	if(fop == NULL)
 		return;
 		
