@@ -18,23 +18,25 @@ int dictionary[11][4];
 void init_dictionary();
 int pow1(int i,int j);
 
-int main() {
+int main(int argc, char **argv) {
 	FILE *fp, *fi;
-	fp = fopen("huffman.txt","w");
-	fi = fopen("intermediate.txt","r");
+	
+	if(strcmp(argv[1],"compress") == 0){
+	fp = fopen(argv[4],"w");
+	fi = fopen(argv[2],"r");
 	
 	stack s;
 	init_stack(&s);
 	init_dictionary();
 //	printf("%lf",pow(2,5));
-	char str[7000] = "54 66 11 4 11 33 44 99 67 12 34 56 00 34 23 12 67 90 34 12 45 56 89 34 12 23 87 12 34 76 89 89 65 12 34 56 78 9 99", enc[7000];
+	char str[90000] = "54 66 11 4 11 33 44 99 67 12 34 56 00 34 23 12 67 90 34 12 45 56 89 34 12 23 87 12 34 76 89 89 65 12 34 56 78 9 99", enc[9000];
 	
 	int bin, dec,i = 0, j, k,st, l = 0;
 	char ascii, ch; 
-	fgets(str,7000,fi);
+	fgets(str,90000,fi);
 	// huffman encoding	
-	printf("Input string - ");
-	puts(str);
+//	printf("Input string - ");
+//	puts(str);
 	while(str[i] != '\0'){
 	
 		// bin = binary representation of char
@@ -88,15 +90,22 @@ int main() {
 		i++;
 
 	}
-	fclose(fp);
-	fp = fopen("huffman1.txt","w");
-	printf("\nEncoded string - ");
-	puts(enc);
-	strcat(enc,"\0");
-	printf("\nDecoded string - ");
+	
+   //  fclose(fp);
+     }
+     
+     else if(strcmp(argv[1],"decompress")==0){
+     fi = fopen(argv[2],"r");
+	fp = fopen(argv[4],"w");
+//	printf("\nEncoded string - ");
+//	puts(enc);
+//	strcat(enc,"\0");
+//	printf("\nDecoded string - ");
+	char enc[90000];
+	fgets(enc,90000,fi);
 	//huffman decoding
-	i = 0;
-	int bin1, bin2, bin3, bin4,sum;
+	int i = 0;
+	int bin1, bin2, bin3, bin4,sum,bin;
 	while(enc[i] != '\0') {
 		
 		bin = enc[i];
@@ -111,11 +120,11 @@ int main() {
 		bin = bin/2;
 		bin4 = bin3 + bin%2 * 8;
 		if(bin4 == 11){
-			printf(" ");
+	//		printf(" ");
 			fprintf(fp," ");
 		}
 		else {
-			printf("%d",bin4-1);
+//			printf("%d",bin4-1);
 			fprintf(fp,"%d",bin4-1);
 		}
 		bin = bin/2;
@@ -127,17 +136,17 @@ int main() {
 		bin = bin/2;
 		bin4 = bin3 + bin%2 * 8;
 		if(bin4 == 11){
-			printf(" ");
+	//		printf(" ");
 			fprintf(fp," ");
 		}
 		else{
-			printf("%d",bin4-1);		
+//			printf("%d",bin4-1);		
 			fprintf(fp,"%d",bin4-1);
 		}
 		i++;
 	}
 	fprintf(fp," %d",-1);
-	
+	}
 	return 0;
 	
 }

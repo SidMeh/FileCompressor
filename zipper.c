@@ -22,7 +22,7 @@ int main(int argc,char **argv) {
 		FILE *fp;
 		fp = fopen(argv[2],"r");
 		FILE *fd;
-		fd = fopen("compressed.txt","w");
+		fd = fopen(argv[4],"w");
 		
 		encode(fp,fd);
 		fclose(fd);
@@ -38,7 +38,7 @@ int main(int argc,char **argv) {
 		FILE *ft;
 		ft = fopen(argv[2],"r");
 		FILE *fdc;
-		fdc = fopen("reference.txt","w");
+		fdc = fopen(argv[4],"w");
 
 		decode(ft,fdc);
 		fclose(ft);
@@ -48,7 +48,17 @@ int main(int argc,char **argv) {
 		printf("Decompressed file - decompressed.txt\n");
 		
 	}
-
+/*	FILE *f1,*f2;
+	f1 = fopen("reference.txt","r");
+	f2 = fopen("o_reference.txt","w");
+	char ch = '\0';
+	int i = 0;
+	while(i < 355){
+		fscanf(f1,"%c",&ch);
+		fprintf(f2,"%c",ch-'0');
+		i++;
+	}
+	}*/
 /*	char ch[5000];
 	fscanf(fd,"%s",ch);
 	printf("%s",ch);
@@ -71,9 +81,11 @@ void encode(FILE *fp,FILE *fd) {
 	init_stack(&s,8);
 	
 	int i = 0, num, j, curr, dec, k, pos = 0,arrray[50];
-	char str[5000], *code;
+	char str[50000], *code;
 	fscanf(fp,"%s",str);
-	
+	int len = strlen(str);
+	len = (len*7)/8 - 3;
+	fprintf(fd,"%d ",len);
 	while(str[i] != '\0') {
 		
 		num = str[i];
@@ -110,7 +122,7 @@ void encode(FILE *fp,FILE *fd) {
 				}
 				else
 					fprintf(fd,"%c",dec);
-				printf("%d %d %c\n",dec,i,dec);
+	//			printf("%d %d %c\n",dec,i,dec);
 			//	if(dec > 256)
 		//			printf("\nERROR\n");
 		//			return;
@@ -120,16 +132,7 @@ void encode(FILE *fp,FILE *fd) {
 		}
 	i++;
 	}	
-	FILE *fr;
-	fr = fopen("reference.txt","w");
-	if(fr == NULL)
-		printf("problem ");
-	for(i=0;i<pos;i++){
-		fprintf(fr,"%d ",arrray[i]-i);
-		printf("\n%d %d",i,arrray[i]);
-	}
-	fprintf(fr,"%d ",-1);
-	fclose(fr);
+
 }
 
 
@@ -139,7 +142,7 @@ void generate_key() {
 		for(j=10;j>=0;j--){
 			key[k][1] = key1[i]+key2[j];
 			key[k][0] = k + 6;
-			printf("\n %d %d ",key[k][0],key[k][1]);
+	//		printf("\n %d %d ",key[k][0],key[k][1]);
 			k++;
 		}
 	}
@@ -177,21 +180,27 @@ void decode(FILE *fp, FILE *fd) {
 
 void decode(FILE *fp,FILE *fd) {
 	char ch, code[9] = "00000000", ref_code[9] = "00000000";
-	int i = 0, j, num, k, bin, num1, dec, ele;
+	int i = 0, j, num, k, bin, num1, dec, ele, limit, flag = 0;
 
 	stack s;
 	init_stack(&s,7);
 	
 	queue q;
-	init(&q,112);
+	init(&q,56);
 	
 	generate_key();
-
-	while(i < 2771){  
+	char str[50000];
+//	fread(str,1,1000,fp);
+	fscanf(fp,"%d ",&limit);
+	while(i < limit-1){  
 	
 		j = 0;
 		while(j < 7){
+//			ch = str[i];
 			fscanf(fp,"%c",&ch);
+			if(ch == ' ' && flag == 0)
+				continue;
+			flag = 1;
 			num = ch;
 			if(num < 0)
 				num = num + 256;
@@ -231,8 +240,8 @@ void decode(FILE *fp,FILE *fd) {
 			dec = dec + pop_stack(&s)*64;
 		
 			dec = dec - 6;
-			
-			fprintf(fd,"%c",key[dec][1]);
+			char ch = key[dec][1] ;
+			fprintf(fd,"%c",ch);
 	//		fprintf(fd,"sd");
 			
 		}	
@@ -240,7 +249,7 @@ void decode(FILE *fp,FILE *fd) {
 		i = i + 7;
 	}
 	char chhh = '\"';
-printf("%d",chhh);
+//printf("%d",chhh);
 }
 
 

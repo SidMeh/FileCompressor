@@ -175,7 +175,21 @@ void encode(FILE *fp, FILE *fi) {
 	insert_pattern(&T,"\t");
 	insert_pattern(&T,"\n");
 	insert_pattern(&T,",");
-//	insert_pattern(&T,".");
+	insert_pattern(&T,"~");
+	insert_pattern(&T,"$");
+	insert_pattern(&T,">");
+	insert_pattern(&T,"<");
+	insert_pattern(&T,"?");
+	insert_pattern(&T,"/");
+	insert_pattern(&T,";");
+	insert_pattern(&T,"{");
+	insert_pattern(&T,"}");
+	insert_pattern(&T,"|");
+	insert_pattern(&T,"-");
+	insert_pattern(&T,"+");
+	insert_pattern(&T,"=");
+	insert_pattern(&T,"\"");
+	insert_pattern(&T,"\'");
 	char sample[9000];
 	fread(sample,1,9000,fp);
 	char output[1000],P1[10] = "",temp[100],nil[1] = "\0",P[10] ,C,K[2];
@@ -199,7 +213,7 @@ void encode(FILE *fp, FILE *fi) {
 			strcpy(P1,nil);
 			strncat(P,&C,1);
 			strncat(P1,&C,1);		
-			printf("%d ",k);
+//			printf("%d ",k);
 		//	makestring(fi,k);
 			fprintf(fi,"%d ",k);			
 		}
@@ -285,12 +299,42 @@ void decode(FILE *fp, FILE *fd) {
       srm.currChar = '\n';
       dictionary[79] = srm;
      srm.currChar = ',';
-     dictionary[80] = srm; 
-        
+     dictionary[80] = srm;
+    srm.currChar = '~';
+     dictionary[81] = srm;
+     srm.currChar = '$';
+     dictionary[82] = srm;
+     srm.currChar = '>';
+     dictionary[83] = srm;
+     srm.currChar = '<';
+     dictionary[84] = srm;
+     srm.currChar = '?';
+     dictionary[85] = srm;
+     srm.currChar = '/';
+     dictionary[86] = srm; 
+     srm.currChar = ';';
+     dictionary[87] = srm;
+ 
+     srm.currChar = '{';
+     dictionary[88] = srm;
+     srm.currChar = '}';
+     dictionary[89] = srm;
+     srm.currChar = '|';
+     dictionary[90] = srm;
+     srm.currChar = '-';
+     dictionary[91] = srm;
+     srm.currChar = '+';
+     dictionary[92] = srm;
+     srm.currChar = '=';
+     dictionary[93] = srm;   
+     srm.currChar = '\"';
+     dictionary[94] = srm;
+     srm.currChar = '\'';
+     dictionary[95] = srm;
     int prev;
     int curr;
     char ch = 'c';
-    int max = 80;
+    int max = 95;
 
 	int num;
 	fscanf(fp,"%d",&num);
@@ -309,7 +353,7 @@ void decode(FILE *fp, FILE *fd) {
         if(curr > max)
         {	
             Output(fd,prev , &tmp);
-            printf("%c",ch);
+     //       printf("%c",ch);
 		  fprintf(fd,"%c",ch);
         }
         else
@@ -338,7 +382,7 @@ void Output(FILE *fp,int key, char *t)
     { //   printf("UYT");
         *t  = dictionary[key].currChar;
         char tmpt = *t;
-        printf("%c",tmpt);
+//        printf("%c",tmpt);
       fprintf(fp,"%c",tmpt);
         return ;
 
@@ -348,7 +392,7 @@ void Output(FILE *fp,int key, char *t)
         int pre = dictionary[key].prefixCode;
         Output(fp,pre, t);
         char curr = dictionary[key].currChar;
-        printf("%c",curr);
+ //       printf("%c",curr);
         fprintf(fp,"%c",curr);
 
     }

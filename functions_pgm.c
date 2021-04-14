@@ -105,7 +105,7 @@ void bit_encode_image(FILE *fp,char *str) {
 	char ch;
 	while(1){
 		fscanf(fp,"%c",&ch);
-		printf("%c",ch);
+//		printf("%c",ch);
 		if(ch == 'e')
 			break;
 			if(ch == '-')
@@ -166,7 +166,7 @@ void bit_encode_image(FILE *fp,char *str) {
 
 void bit_decode_image(FILE *fr){
 //	FILE *fr = fopen(str,"r");
-	printf("YES");
+//	printf("YES");
 	FILE *fw = fopen("image_out.txt","w");
 	
 	int bin, bin1, bin2, bin3, bin4;
@@ -230,7 +230,7 @@ void convert_txt_into_pgm(FILE *fimg, FILE *ftxt){
 	for(i=0;i<256;i++){
 		fscanf(fr,"%d %d",&num1, &num2);
 		code_arr[num2] = num1;
-		printf("\n%d %d",num1,num2);
+//		printf("\n%d %d",num1,num2);
 	}
 	fclose(fr);
 	
@@ -361,6 +361,8 @@ void reduce_image_size(FILE *fp, FILE *fop){
 	printf("Enter the percentage to reduction of the .pgm image : ");
 	int percentage;
 	scanf("%d",&percentage);
+	if(percentage == -1)
+		return;
 	percentage = percentage;
 	float ratio = (1.0*percentage)/100;
 	pgm_Image Image, Image_out;
@@ -538,7 +540,7 @@ void convert_image_from_ppm_to_txt(ppm_Image Image,char *str1){
 		insert_max_heap(&h,code_arr[i][0],i);
 	map_code_via_heap(h,code_arr);
 	for(i=0;i<256;i++){
-		printf("\n%d %d",i,code_arr[i][1]);		
+//		printf("\n%d %d",i,code_arr[i][1]);		
 		if(code_arr[i][1] > 255)
 			printf("ERROR");
 	}
@@ -585,9 +587,9 @@ void convert_txt_data_to_ppm(FILE *fp, FILE *ftxt){
 	fprintf(fp,"%s\n",Image.header);
 	fprintf(fp,"%d %d\n", Image.width, Image.height);
 	fprintf(fp,"%d\n",Image.max_color_scale);
-	printf("%s\n",Image.header);
-	printf("%d %d\n", Image.width, Image.height);
-	printf("%d\n",Image.max_color_scale);
+	printf("Header :%s\n",Image.header);
+	printf("Width & Height: %d %d\n", Image.width, Image.height);
+	printf("Maximum colour scale :%d\n",Image.max_color_scale);
 	int i, j, num1, num2, num3, code_arr[256];
 	for(i =0; i < 256; i++){
 		fscanf(fr,"%d %d", &num1, &num2);
@@ -608,7 +610,7 @@ void convert_txt_data_to_ppm(FILE *fp, FILE *ftxt){
 	for(i=0;i<Image.height;i++){
 		for(j=0;j< Image.width;j++){
 			fscanf(ft,"%d %d %d", &num1, &num2, &num3);
-			printf("%d %d %d ",num1,num2,num3);
+//			printf("%d %d %d ",num1,num2,num3);
 			Image.pixel_array[i][j][R] = code_arr[num1];
 			Image.pixel_array[i][j][G] = code_arr[num2];
 			Image.pixel_array[i][j][B] = code_arr[num3];
